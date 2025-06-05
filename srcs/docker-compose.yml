@@ -10,6 +10,8 @@ services:
     networks:
       - inception
     restart: always
+    depends_on:
+      - wordpress
 
   wordpress:
     build: ./requirements/wordpress

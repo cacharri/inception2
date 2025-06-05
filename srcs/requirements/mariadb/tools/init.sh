@@ -1,10 +1,14 @@
-#!/bin/sh
+#!/bin/bash
+service mysql start
 
-# Este script se ejecuta como entrypoint del contenedor de MariaDB.
-# Copia el archivo SQL de configuración inicial a la ruta que MariaDB usará al iniciar.
+# Esperar a que MariaDB esté activo
+until mysqladmin ping --silent; do
+    echo "Esperando MariaDB..."
+    sleep 1
+done
 
-# Copiar init.sql al directorio de inicialización de MariaDB
-cp /conf/init.sql /docker-entrypoint-initdb.d/init.sql
+# Ejecutar SQL de inicialización
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" < /conf/init.sql
 
-# Ejecutar el entrypoint original de MariaDB
+# Mantener el contenedor vivo como debe ser (PID 1)
 exec mysqld
