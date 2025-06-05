@@ -12,9 +12,10 @@ RUN mkdir -p /etc/nginx/certs
 COPY conf/nginx.conf /etc/nginx/conf.d/default.conf
 COPY tools/generate_ssl.sh /usr/local/bin/generate_ssl.sh
 
-# Ejecutar el script para generar el certificado SSL
+# Ejecutar el script para generar el certificado SSL y dar permisos de lectura
 RUN chmod +x /usr/local/bin/generate_ssl.sh && \
-    /usr/local/bin/generate_ssl.sh
+    /usr/local/bin/generate_ssl.sh && \
+    chmod 644 /etc/nginx/certs/server.crt /etc/nginx/certs/server.key
 
 # Exponer el puerto HTTPS
 EXPOSE 443
