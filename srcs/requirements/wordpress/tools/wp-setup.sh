@@ -18,6 +18,10 @@ if [ ! -f /var/www/html/wp-config.php ]; then
   echo "Descargando WordPress..."
   wp core download --allow-root
 
+  echo "Corrigiendo permisos..."
+  chown -R www-data:www-data /var/www/html
+  chmod -R 755 /var/www/html
+
   echo "Creando archivo de configuración..."
   wp config create \
     --dbname=${MYSQL_DATABASE} \

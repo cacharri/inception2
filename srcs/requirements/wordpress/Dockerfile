@@ -13,9 +13,7 @@ RUN apt-get update && \
 COPY tools/wp-setup.sh /usr/local/bin/wp-setup.sh
 COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 
-RUN chmod +x /usr/local/bin/wp-setup.sh && \
-    chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
+RUN chmod +x /usr/local/bin/wp-setup.sh
 
 # Puerto donde escucha php-fpm
 EXPOSE 9000
