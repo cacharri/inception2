@@ -1,11 +1,17 @@
 FROM debian:bullseye
 
-RUN apt-get update && \
-    apt-get install -y mariadb-server && \
-    rm -rf /var/lib/apt/lists/*
+# Instalar MariaDB
+RUN apt update && apt install -y mariadb-server
 
-COPY tools/init.sql /docker-entrypoint-initdb.d/
+# Crear carpetas de trabajo
+RUN mkdir -p /conf /tools
 
-EXPOSE 3306
+# Copiar scripts y SQL
+COPY conf/init.sql /conf/init.sql
+COPY tools/init.sh /tools/init.sh
 
-CMD ["mysqld"]
+# Hacer el script ejecutable
+RUN chmod +x /tools/init.sh
+
+# Definir entrypoint
+ENTRYPOINT ["/tools/init.sh"]

@@ -1,17 +1,24 @@
 FROM debian:bullseye
 
+# Instalar dependencias
 RUN apt-get update && \
-    apt-get install -y php php-fpm php-mysql wget tar unzip && \
-    mkdir -p /var/www/html && \
-    wget https://wordpress.org/latest.tar.gz && \
-    tar -xzf latest.tar.gz -C /var/www/html --strip-components=1 && \
-    rm latest.tar.gz && \
+    apt-get install -y php php-fpm php-mysql wget curl mariadb-client unzip less \
+    php-cli php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip && \
+    curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x wp-cli.phar && \
+    mv wp-cli.phar /usr/local/bin/wp && \
+    mkdir -p /var/www/html
+
+# Copiar archivos personalizados
+COPY tools/wp-setup.sh /usr/local/bin/wp-setup.sh
+COPY conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
+
+RUN chmod +x /usr/local/bin/wp-setup.sh && \
     chown -R www-data:www-data /var/www/html
 
-COPY tools/setup.sh /setup.sh
-RUN chmod +x /setup.sh
-
+# Puerto donde escucha php-fpm
 EXPOSE 9000
 
-CMD ["sh", "-c", "php-fpm* -F"]
+# Usar wp-setup.sh como entrypoint
+CMD ["sh", "/usr/local/bin/wp-setup.sh"]
 
