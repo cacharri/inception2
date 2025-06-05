@@ -21,5 +21,5 @@ RUN chmod +x /usr/local/bin/wp-setup.sh && \
 EXPOSE 9000
 
 # Usar wp-setup.sh como entrypoint
-CMD ["sh", "/usr/local/bin/wp-setup.sh"]
+CMD ["/usr/local/bin/wp-setup.sh"]
 

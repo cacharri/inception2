@@ -1,39 +1,40 @@
 #!/bin/sh
 
 # Esperar a que MariaDB esté disponible
+echo "Esperando a MariaDB..."
 until mysqladmin ping -h mariadb --silent; do
-    echo "Esperando a que MariaDB esté disponible..."
-    sleep 2
+  echo "MariaDB aún no está lista, esperando..."
+  sleep 2
 done
+echo "MariaDB disponible."
 
-# Descargar WordPress si no está
+# Solo instalar si no existe wp-config.php
 if [ ! -f /var/www/html/wp-config.php ]; then
-    echo "Descargando WordPress..."
-    wp core download --path=/var/www/html --allow-root
+  cd /var/www/html || exit 1
 
-    echo "Creando archivo de configuración..."
-    wp config create \
-        --dbname=$MYSQL_DATABASE \
-        --dbuser=$MYSQL_USER \
-        --dbpass=$MYSQL_PASSWORD \
-        --dbhost=mariadb \
-        --path=/var/www/html \
-        --allow-root
+  echo "Descargando WordPress..."
+  wp core download --allow-root
 
-    echo "Instalando WordPress..."
-    wp core install \
-        --url=https://$DOMAIN_NAME \
-        --title="Inception Site" \
-        --admin_user=$WP_ADMIN_USER \
-        --admin_password=$WP_ADMIN_PASS \
-        --admin_email=$WP_ADMIN_EMAIL \
-        --path=/var/www/html \
-        --skip-email \
-        --allow-root
+  echo "Creando archivo de configuración..."
+  wp config create \
+    --dbname=$MYSQL_DATABASE \
+    --dbuser=$MYSQL_USER \
+    --dbpass=$MYSQL_PASSWORD \
+    --dbhost=mariadb \
+    --allow-root
 
-    chown -R www-data:www-data /var/www/html
-    chmod -R 755 /var/www/html
+  echo "Instalando WordPress..."
+  wp core install \
+    --url=https://$DOMAIN_NAME \
+    --title="Inception" \
+    --admin_user=$WP_ADMIN_USER \
+    --admin_password=$WP_ADMIN_PASS \
+    --admin_email=$WP_ADMIN_EMAIL \
+    --skip-email \
+    --allow-root
+else
+  echo "WordPress ya está instalado. Saltando setup."
 fi
 
-# Iniciar PHP-FPM
+# Lanza PHP-FPM
 php-fpm7.4 -F
