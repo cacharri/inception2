@@ -6,20 +6,23 @@ until mysqladmin ping -h mariadb --silent; do
   echo "MariaDB aún no está lista, esperando..."
   sleep 2
 done
+sleep 5
 echo "MariaDB disponible."
 
 # Solo instalar si no existe wp-config.php
 if [ ! -f /var/www/html/wp-config.php ]; then
   cd /var/www/html || exit 1
 
+  rm -f index.nginx-debian.html
+
   echo "Descargando WordPress..."
   wp core download --allow-root
 
   echo "Creando archivo de configuración..."
   wp config create \
-    --dbname=$MYSQL_DATABASE \
-    --dbuser=$MYSQL_USER \
-    --dbpass=$MYSQL_PASSWORD \
+    --dbname=${MYSQL_DATABASE} \
+    --dbuser=${MYSQL_USER} \
+    --dbpass=${MYSQL_PASSWORD} \
     --dbhost=mariadb \
     --allow-root
 
