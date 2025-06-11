@@ -13,5 +13,4 @@ COPY tools/init.sh /tools/init.sh
 # Hacer el script ejecutable
 RUN chmod +x /tools/init.sh
 
-# Definir entrypoint
-ENTRYPOINT ["/tools/init.sh"]
+CMD ["mysqld"]

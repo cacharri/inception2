@@ -1,22 +1,19 @@
 #!/bin/sh
 
-# Esperar a que MariaDB esté disponible
 echo "Esperando a MariaDB..."
 until mysqladmin ping -h mariadb --silent; do
   echo "MariaDB aún no está lista, esperando..."
   sleep 2
 done
-sleep 5
+
 echo "MariaDB disponible."
 
-# Solo instalar si no existe wp-config.php
 if [ ! -f /var/www/html/wp-config.php ]; then
-  cd /var/www/html || exit 1
+  echo "Descargando WordPress en /tmp..."
+  wp core download --allow-root --path=/tmp/wordpress
 
-  rm -f index.nginx-debian.html
-
-  echo "Descargando WordPress..."
-  wp core download --allow-root
+  echo "Moviendo WordPress a /var/www/html..."
+  cp -R /tmp/wordpress/* /var/www/html
 
   echo "Corrigiendo permisos..."
   chown -R www-data:www-data /var/www/html
@@ -28,20 +25,20 @@ if [ ! -f /var/www/html/wp-config.php ]; then
     --dbuser=${MYSQL_USER} \
     --dbpass=${MYSQL_PASSWORD} \
     --dbhost=mariadb \
+    --path=/var/www/html \
     --allow-root
 
   echo "Instalando WordPress..."
   wp core install \
-    --url=https://$DOMAIN_NAME \
+    --url=https://${DOMAIN_NAME} \
     --title="Inception" \
-    --admin_user=$WP_ADMIN_USER \
-    --admin_password=$WP_ADMIN_PASS \
-    --admin_email=$WP_ADMIN_EMAIL \
-    --skip-email \
+    --admin_user=${WP_ADMIN_USER} \
+    --admin_password=${WP_ADMIN_PASS} \
+    --admin_email=${WP_ADMIN_EMAIL} \
+    --path=/var/www/html \
     --allow-root
 else
-  echo "WordPress ya está instalado. Saltando setup."
+  echo "WordPress ya está instalado. Saltando instalación."
 fi
 
-# Lanza PHP-FPM
-php-fpm7.4 -F
+exec php-fpm7.4 -F
