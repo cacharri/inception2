@@ -5,7 +5,7 @@ down:
 	docker compose -f srcs/docker-compose.yml down
 
 fclean:
-	docker compose -f srcs/docker-compose.yml down --volumes --remove-orphans
+	docker compose -f srcs/docker-compose.yml down --volumes --remove-orphans --rmi all
 	rm -rf srcs/requirements/mariadb/data/*
 
 re: fclean all

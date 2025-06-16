@@ -3,13 +3,16 @@ FROM debian:bullseye
 # Instalar NGINX y OpenSSL
 RUN apt-get update && \
     apt-get install -y nginx openssl && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
+    && ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log 
 
 # Crear directorio para certificados (en caso de que no exista aún)
 RUN mkdir -p /etc/nginx/certs
 
 # Copiar config y script de generación de certificados
-COPY conf/nginx.conf /etc/nginx/conf.d/default.conf
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY conf/default.conf /etc/nginx/conf.d/default.conf
 COPY tools/generate_ssl.sh /usr/local/bin/generate_ssl.sh
 
 # Ejecutar el script para generar el certificado SSL y dar permisos de lectura

@@ -1,12 +1,11 @@
 #!/bin/sh
 set -e
 
-# Espera a que mysqld esté disponible
-echo "Esperando a que MariaDB arranque..."
-until mysqladmin ping -h localhost --silent; do
-  sleep 1
-done
+echo "[init.sh] Preparando socket de MariaDB..."
+# Ya lo creamos en el Dockerfile, pero reforzamos permisos
+mkdir -p /var/run/mysqld
+chown -R mysql:mysql /var/run/mysqld
 
-# Ejecuta el SQL
-echo "Ejecutando script de inicialización SQL..."
-mysql -u root -p$MYSQL_ROOT_PASSWORD < /conf/init.sql
+echo "[init.sh] Iniciando MariaDB y ejecutando SQL de inicialización..."
+# Arranca mysqld con el init-file para ejecutar tu SQL
+exec mysqld --user=mysql --init-file=/conf/init.sql

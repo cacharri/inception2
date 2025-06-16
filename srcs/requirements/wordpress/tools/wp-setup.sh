@@ -1,25 +1,25 @@
 #!/bin/sh
 
-echo "Esperando a MariaDB..."
+echo "[wp-setup] Esperando a MariaDB..."
 until mysqladmin ping -h mariadb --silent; do
-  echo "MariaDB aún no está lista, esperando..."
   sleep 2
 done
-
-echo "MariaDB disponible."
+echo "[wp-setup] MariaDB disponible."
 
 if [ ! -f /var/www/html/wp-config.php ]; then
-  echo "Descargando WordPress en /tmp..."
+  cp /tmp/wp-config.php /var/www/html/wp-config.php
+
+  echo "[wp-setup] Descargando WordPress en /tmp..."
   wp core download --allow-root --path=/tmp/wordpress
 
-  echo "Moviendo WordPress a /var/www/html..."
+  echo "[wp-setup] Moviendo WordPress a /var/www/html..."
   cp -R /tmp/wordpress/* /var/www/html
 
-  echo "Corrigiendo permisos..."
+  echo "[wp-setup] Corrigiendo permisos..."
   chown -R www-data:www-data /var/www/html
   chmod -R 755 /var/www/html
 
-  echo "Creando archivo de configuración..."
+  echo "[wp-setup] Creando wp-config.php..."
   wp config create \
     --dbname=${MYSQL_DATABASE} \
     --dbuser=${MYSQL_USER} \
@@ -28,7 +28,7 @@ if [ ! -f /var/www/html/wp-config.php ]; then
     --path=/var/www/html \
     --allow-root
 
-  echo "Instalando WordPress..."
+  echo "[wp-setup] Instalando WordPress..."
   wp core install \
     --url=https://${DOMAIN_NAME} \
     --title="Inception" \
@@ -37,8 +37,15 @@ if [ ! -f /var/www/html/wp-config.php ]; then
     --admin_email=${WP_ADMIN_EMAIL} \
     --path=/var/www/html \
     --allow-root
+  echo "WordPress instalado correctamente."
+
 else
-  echo "WordPress ya está instalado. Saltando instalación."
+  echo "[wp-setup] WordPress ya está instalado. Saltando."
 fi
 
-exec php-fpm7.4 -F
+sed -i 's/listen = \/run\/php\/7.4-fpm.sock/listen = 9000/g' /etc/php/7.4/fpm/pool.d/www.conf
+sed -i 's/;clear_env = no/clear_env = no/' /etc/php/7.4/fpm/pool.d/www.conf
+mkdir -p /run/php
+
+echo "[wp-setup] Arrancando PHP-FPM en TCP:9000..."
+exec "$@"
