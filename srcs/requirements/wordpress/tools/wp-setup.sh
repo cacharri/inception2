@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-# No repitas instalación si ya está hecho
+# Si ya está instalado, no repetir
 if [ -f /var/www/html/.installed ]; then
   echo "[wp-setup] WordPress ya está instalado. Saltando setup."
   exec php-fpm7.4 -F
@@ -17,7 +17,7 @@ echo "[wp-setup] Limpiando /var/www/html..."
 rm -rf /var/www/html/*
 mkdir -p /var/www/html
 
-echo "[wp-setup] Descargando WordPress directamente en /var/www/html..."
+echo "[wp-setup] Descargando WordPress en /var/www/html..."
 wp core download --allow-root --path=/var/www/html
 
 echo "[wp-setup] Corrigiendo permisos..."
@@ -35,9 +35,9 @@ wp config create \
 
 chown www-data:www-data /var/www/html/wp-config.php
 
-echo "[wp-setup] Instalando WordPress..."
+echo "[wp-setup] Instalando WordPress con localhost..."
 wp core install \
-  --url=https://${DOMAIN_NAME} \
+  --url=https://localhost \
   --title="Inception" \
   --admin_user=${WP_ADMIN_USER} \
   --admin_password=${WP_ADMIN_PASS} \
