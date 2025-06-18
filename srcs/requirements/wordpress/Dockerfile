@@ -25,7 +25,6 @@ RUN curl -sSL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-c
 # 5) Copia tu script de setup y dale permisos
 COPY tools/wp-setup.sh /usr/local/bin/wp-setup.sh
 COPY tools/wp-config.php /tmp/wp-config.php
-COPY conf/www.conf /usr/local/bin/www.conf
 RUN chmod +x /usr/local/bin/wp-setup.sh
 
 # 6) Crea un alias para php-fpm

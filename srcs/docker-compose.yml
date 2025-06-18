@@ -26,21 +26,34 @@ services:
     networks:
       - inception
     restart: always
-      
+
   nginx:
     build: ./requirements/nginx
     container_name: nginx
     ports:
       - "443:443"
     volumes:
-      - wp_files:/var/www/html
+      - wp_files:/var/www/html:ro
     networks:
       - inception
     restart: always
 
 volumes:
   db_data:
+    name: mariadb
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/cach/data/mysql
+
   wp_files:
+    name: wordpress
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/cach/data/wordpress
 
 networks:
   inception:
