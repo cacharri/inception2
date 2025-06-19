@@ -45,7 +45,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/cach/data/mysql
+      device: /home/ialvarez/data/mysql
 
   wp_files:
     name: wordpress
@@ -53,7 +53,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/cach/data/wordpress
+      device: /home/ialvarez/data/wordpress
 
 networks:
   inception:

@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+DOMAIN_NAME=${DOMAIN_NAME:-localhost}
+
 # Si ya está instalado, no repetir
 if [ -f /var/www/html/.installed ]; then
   echo "[wp-setup] WordPress ya está instalado. Saltando setup."
@@ -35,9 +37,9 @@ wp config create \
 
 chown www-data:www-data /var/www/html/wp-config.php
 
-echo "[wp-setup] Instalando WordPress con localhost..."
+echo "[wp-setup] Instalando WordPress con dominio: ${DOMAIN_NAME}..."
 wp core install \
-  --url=https://localhost \
+  --url=https://${DOMAIN_NAME} \
   --title="Inception" \
   --admin_user=${WP_ADMIN_USER} \
   --admin_password=${WP_ADMIN_PASS} \
