@@ -22,14 +22,14 @@ RUN curl -sSL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-c
       -o /usr/local/bin/wp && \
     chmod +x /usr/local/bin/wp
 
-# 5) Copia tu script de setup y dale permisos
+# 5) Copia el script de setup y le da permisos
 COPY tools/wp-setup.sh /usr/local/bin/wp-setup.sh
 COPY tools/wp-config.php /tmp/wp-config.php
 RUN chmod +x /usr/local/bin/wp-setup.sh
 
 # 6) Crea un alias para php-fpm
 RUN ln -sf /usr/sbin/php-fpm7.4 /usr/local/bin/php-fpm
-# 8) Lanza el setup (que a su vez arranca php-fpm)
+
 
 
 ENTRYPOINT [ "wp-setup.sh"]

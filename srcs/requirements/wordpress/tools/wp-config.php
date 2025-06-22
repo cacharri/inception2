@@ -8,11 +8,11 @@
 define( 'WP_HOME', 'https://' . $_SERVER['HTTP_HOST'] );
 define( 'WP_SITEURL', 'https://' . $_SERVER['HTTP_HOST'] );
 
-// ** MySQL settings - pulled from ENV vars ** //
+// ** MySQL settings ** //
 define( 'DB_NAME',     getenv('MYSQL_DATABASE') ?: die('Falta la var MYSQL_DATABASE') );
 define( 'DB_USER',     getenv('MYSQL_USER')     ?: die('Falta la var MYSQL_USER') );
 define( 'DB_PASSWORD', getenv('MYSQL_PASSWORD') ?: die('Falta la var MYSQL_PASSWORD') );
-// Si tu servicio de MariaDB se llama "mysql" y escucha en el puerto 3306:
+// Si el servicio de MariaDB se llama "mysql" y escucha en el puerto 3306:
 define( 'DB_HOST',     ( getenv('MYSQL_HOST') ?: 'mysql' ) . ':3306' );
 
 define( 'DB_CHARSET', 'utf8' );
@@ -21,7 +21,7 @@ define( 'DB_COLLATE', '' );
 define( 'WP_ALLOW_REPAIR', true );
 
 /**#@+
- * Authentication Unique Keys and Salts.
+ * Authentication 
  */
 define( 'AUTH_KEY',         '):Uw9 :|7$m3yy=c^IM%d8}zG6yXY%25SDUyr.r#GcDP)[b25Yn$sDLNwR~I=kwq' );
 define( 'SECURE_AUTH_KEY',  'lBWxAzhu=StQ(s-[t_D8yH8_`0NiM~d[m q<{Hri]n#UM3J;@x[ne;,k<~cN`~%,' );
@@ -48,8 +48,6 @@ $table_prefix = 'wp_';
 
 // ** Debug mode ** //
 define( 'WP_DEBUG', true );
-
-/* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the WordPress directory. */
 if ( ! defined( 'ABSPATH' ) ) {
