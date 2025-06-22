@@ -47,6 +47,9 @@ wp core install \
   --path=/var/www/html \
   --allow-root
 
+echo "[wp-setup] Instalando y activando tema 'twentytwenty'..."
+wp theme install twentytwenty --activate --path=/var/www/html --allow-root
+
 # Marcar como instalado
 touch /var/www/html/.installed
 
