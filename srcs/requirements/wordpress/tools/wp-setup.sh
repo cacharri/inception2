@@ -23,8 +23,16 @@ echo "[wp-setup] Descargando WordPress en /var/www/html..."
 wp core download --allow-root --path=/var/www/html
 
 echo "[wp-setup] Corrigiendo permisos..."
-chown -R www-data:www-data /var/www/html
-chmod -R 755 /var/www/html
+chown -R root:root /var/www/html
+find /var/www/html -type d -exec chmod 755 {} +
+find /var/www/html -type f -exec chmod 644 {} +
+
+# PHP solo necesita escribir en el directorio de archivos subidos. El codigo de
+# WordPress permanece propiedad de root para que PHP-FPM no pueda modificarlo.
+mkdir -p /var/www/html/wp-content/uploads
+chown -R www-data:www-data /var/www/html/wp-content/uploads
+find /var/www/html/wp-content/uploads -type d -exec chmod 755 {} +
+find /var/www/html/wp-content/uploads -type f -exec chmod 644 {} +
 
 echo "[wp-setup] Creando wp-config.php..."
 wp config create \
@@ -35,7 +43,8 @@ wp config create \
   --path=/var/www/html \
   --allow-root
 
-chown www-data:www-data /var/www/html/wp-config.php
+chown root:www-data /var/www/html/wp-config.php
+chmod 640 /var/www/html/wp-config.php
 
 echo "[wp-setup] Instalando WordPress con dominio: ${DOMAIN_NAME}..."
 wp core install \
