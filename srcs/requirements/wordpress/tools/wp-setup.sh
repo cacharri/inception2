@@ -3,9 +3,34 @@ set -e
 
 DOMAIN_NAME=${DOMAIN_NAME:-localhost}
 
+secure_wordpress_files() {
+  # PHP-FPM must not be able to modify executable WordPress code or config.
+  chown -R root:root /var/www/html
+  find /var/www/html -type d -exec chmod 755 {} +
+  find /var/www/html -type f -exec chmod 644 {} +
+
+  if [ -f /var/www/html/wp-config.php ]; then
+    chown root:www-data /var/www/html/wp-config.php
+    chmod 640 /var/www/html/wp-config.php
+  fi
+
+  # WordPress only needs runtime write access for user uploads.
+  mkdir -p /var/www/html/wp-content/uploads
+  chown -R www-data:www-data /var/www/html/wp-content/uploads
+}
+
+disable_dashboard_code_changes() {
+  if [ -f /var/www/html/wp-config.php ]; then
+    wp config set DISALLOW_FILE_EDIT true --raw --path=/var/www/html --allow-root
+    wp config set DISALLOW_FILE_MODS true --raw --path=/var/www/html --allow-root
+  fi
+}
+
 # Si ya está instalado, no repetir
 if [ -f /var/www/html/.installed ]; then
   echo "[wp-setup] WordPress ya está instalado. Saltando setup."
+  disable_dashboard_code_changes
+  secure_wordpress_files
   exec php-fpm7.4 -F
 fi
 
@@ -23,8 +48,7 @@ echo "[wp-setup] Descargando WordPress en /var/www/html..."
 wp core download --allow-root --path=/var/www/html
 
 echo "[wp-setup] Corrigiendo permisos..."
-chown -R www-data:www-data /var/www/html
-chmod -R 755 /var/www/html
+secure_wordpress_files
 
 echo "[wp-setup] Creando wp-config.php..."
 wp config create \
@@ -34,8 +58,6 @@ wp config create \
   --dbhost=mariadb \
   --path=/var/www/html \
   --allow-root
-
-chown www-data:www-data /var/www/html/wp-config.php
 
 echo "[wp-setup] Instalando WordPress con dominio: ${DOMAIN_NAME}..."
 wp core install \
@@ -52,6 +74,8 @@ wp theme install twentytwenty --activate --path=/var/www/html --allow-root
 
 # Marcar como instalado
 touch /var/www/html/.installed
+disable_dashboard_code_changes
+secure_wordpress_files
 
 echo "[wp-setup] WordPress instalado correctamente. Arrancando PHP-FPM..."
 
